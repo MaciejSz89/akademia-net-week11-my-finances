@@ -39,13 +39,12 @@ namespace MyFinances.WebApi.Controllers
 
             try
             {
-                throw new Exception("Błąd");
-                //response.Data = _unitOfWork.Operation.Get().ToDtos();
+                response.Data = _unitOfWork.Operation.Get().ToDtos();
             }
             catch (Exception exception)
             {
                 //logowanie do pliku..
-                response.Errors.Add(new Error(exception.Source, 
+                response.Errors.Add(new Error(exception.Source,
                                               exception.Message));
             }
             return response;
@@ -64,6 +63,30 @@ namespace MyFinances.WebApi.Controllers
             try
             {
                 response.Data = _unitOfWork.Operation.Get(id)?.ToDto();
+            }
+            catch (Exception exception)
+            {
+                //logowanie do pliku..
+                response.Errors.Add(new Error(exception.Source,
+                                              exception.Message));
+            }
+            return response;
+        }
+
+        [HttpGet("{pageSize}/{currentPage}")]
+        public DataResponse<IEnumerable<OperationDto>> Get(int pageSize, int currentPage)
+        {
+            var response = new DataResponse<IEnumerable<OperationDto>>();
+
+            try
+            {
+                if (pageSize <= 0)
+                    throw  new ArgumentException(nameof(pageSize));
+
+                if (currentPage <= 0)
+                    throw new ArgumentException(nameof(currentPage));
+                
+                response.Data = _unitOfWork.Operation.Get(pageSize, currentPage).ToDtos();
             }
             catch (Exception exception)
             {

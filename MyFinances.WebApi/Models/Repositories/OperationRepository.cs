@@ -20,7 +20,7 @@ namespace MyFinances.WebApi.Models.Repositories
             return _context.Operations.FirstOrDefault(x => x.Id == id);
         }
 
-        public void Add(Operation operation) 
+        public void Add(Operation operation)
         {
             operation.Date = DateTime.Now;
             _context.Operations.Add(operation);
@@ -30,7 +30,7 @@ namespace MyFinances.WebApi.Models.Repositories
         {
             var operationToUpdate = _context.Operations.First(x => x.Id == operation.Id);
             operationToUpdate.CategoryId = operation.CategoryId;
-            operationToUpdate.Description = operation.Description;  
+            operationToUpdate.Description = operation.Description;
             operationToUpdate.Name = operation.Name;
             operationToUpdate.Value = operation.Value;
 
@@ -44,5 +44,17 @@ namespace MyFinances.WebApi.Models.Repositories
             _context.Operations.Remove(operationToDelete);
         }
 
-    }
+        public IEnumerable<Operation> Get(int pageSize, int currentPage)
+        {
+
+            return _context.Operations
+                           .OrderBy(o => o.Id)
+                           .Skip((currentPage - 1) * pageSize)
+                           .Take(pageSize)
+                           .ToList();
+
+        }
+
+
+}
 }
