@@ -1,4 +1,7 @@
-﻿namespace MyFinances.WebApi.Models.Response
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace MyFinances.Core.Response
 {
     public class Response
     {

@@ -3,7 +3,7 @@ using MyFinances.WebApi.Models.Repositories;
 
 namespace MyFinances.WebApi.Models
 {
-    public class UnitOfWork
+    public class UnitOfWork : IUnitOfWork
     {
         private readonly MyFinancesContext _context;
 
@@ -14,7 +14,7 @@ namespace MyFinances.WebApi.Models
         }
 
         public OperationRepository Operation { get; set; }
-        
+
         public void Complete()
         {
             _context.SaveChanges();

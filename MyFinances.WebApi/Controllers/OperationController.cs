@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using MyFinances.Core.Dtos;
+using MyFinances.Core.Response;
 using MyFinances.WebApi.Models;
 using MyFinances.WebApi.Models.Converters;
-using MyFinances.WebApi.Models.Domains;
-using MyFinances.WebApi.Models.Dtos;
-using MyFinances.WebApi.Models.Response;
+using MyFinances.WebApi.Models.Services;
 
 namespace MyFinances.WebApi.Controllers
 {
@@ -12,11 +11,11 @@ namespace MyFinances.WebApi.Controllers
     [ApiController]
     public class OperationController : ControllerBase
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IOperationService _operationService;
 
-        public OperationController(UnitOfWork unitOfWork)
+        public OperationController(IOperationService operationService)
         {
-            _unitOfWork = unitOfWork;
+            _operationService = operationService;
         }
 
         //[HttpGet]
@@ -39,7 +38,7 @@ namespace MyFinances.WebApi.Controllers
 
             try
             {
-                response.Data = _unitOfWork.Operation.Get().ToDtos();
+                response.Data = _operationService.Get();
             }
             catch (Exception exception)
             {
@@ -62,7 +61,7 @@ namespace MyFinances.WebApi.Controllers
 
             try
             {
-                response.Data = _unitOfWork.Operation.Get(id)?.ToDto();
+                response.Data = _operationService.Get(id);
             }
             catch (Exception exception)
             {
@@ -74,9 +73,9 @@ namespace MyFinances.WebApi.Controllers
         }
 
         [HttpGet("{pageSize}/{currentPage}")]
-        public DataResponse<IEnumerable<OperationDto>> Get(int pageSize, int currentPage)
+        public DataResponse<OperationPageDto> Get(int pageSize, int currentPage)
         {
-            var response = new DataResponse<IEnumerable<OperationDto>>();
+            var response = new DataResponse<OperationPageDto>();
 
             try
             {
@@ -86,7 +85,7 @@ namespace MyFinances.WebApi.Controllers
                 if (currentPage <= 0)
                     throw new ArgumentException(nameof(currentPage));
                 
-                response.Data = _unitOfWork.Operation.Get(pageSize, currentPage).ToDtos();
+                response.Data = _operationService.Get(pageSize, currentPage); 
             }
             catch (Exception exception)
             {
@@ -104,10 +103,9 @@ namespace MyFinances.WebApi.Controllers
 
             try
             {
-                var operation = operationDto.ToDao();
-                _unitOfWork.Operation.Add(operation);
-                _unitOfWork.Complete();
-                response.Data = operation.Id;
+                
+    
+                response.Data = _operationService.Add(operationDto);
             }
             catch (Exception exception)
             {
@@ -119,14 +117,13 @@ namespace MyFinances.WebApi.Controllers
         }
 
         [HttpPut]
-        public Response Update(OperationDto operation)
+        public Response Update(OperationDto operationDto)
         {
             var response = new Response();
 
             try
             {
-                _unitOfWork.Operation.Update(operation.ToDao());
-                _unitOfWork.Complete();
+                _operationService.Update(operationDto);
             }
             catch (Exception exception)
             {
@@ -144,8 +141,7 @@ namespace MyFinances.WebApi.Controllers
 
             try
             {
-                _unitOfWork.Operation.Delete(id);
-                _unitOfWork.Complete();
+                _operationService.Delete(id);
             }
             catch (Exception exception)
             {

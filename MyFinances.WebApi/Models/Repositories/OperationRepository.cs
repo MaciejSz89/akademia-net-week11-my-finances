@@ -1,8 +1,10 @@
-﻿using MyFinances.WebApi.Models.Domains;
+﻿using MyFinances.Core.Dtos;
+using MyFinances.Core.Response;
+using MyFinances.WebApi.Models.Domains;
 
 namespace MyFinances.WebApi.Models.Repositories
 {
-    public class OperationRepository
+    public class OperationRepository : IOperationRepository
     {
         private readonly MyFinancesContext _context;
 
@@ -44,17 +46,33 @@ namespace MyFinances.WebApi.Models.Repositories
             _context.Operations.Remove(operationToDelete);
         }
 
-        public IEnumerable<Operation> Get(int pageSize, int currentPage)
+        public IDataPage<Operation> Get(int pageSize, int currentPage)
         {
+            var lastPage = (_context.Operations.Count() + pageSize - 1) / pageSize;
+            var updatedCurrentPage = lastPage > pageSize * (currentPage - 1)
+                                   ? currentPage
+                                   : lastPage;
 
-            return _context.Operations
-                           .OrderBy(o => o.Id)
-                           .Skip((currentPage - 1) * pageSize)
-                           .Take(pageSize)
-                           .ToList();
+            var operationsPage = _context.Operations
+                                         .OrderBy(o => o.Id)
+                                         .Skip((updatedCurrentPage - 1) * pageSize)
+                                         .Take(pageSize)
+                                         .ToList();
+
+
+            var result = new DataPage<Operation>
+            {
+                Items = operationsPage,
+                LastPage = lastPage,
+                CurrentPage = updatedCurrentPage
+
+            };
+
+
+            return result;
 
         }
 
 
-}
+    }
 }

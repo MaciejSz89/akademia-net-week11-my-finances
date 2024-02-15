@@ -1,5 +1,5 @@
-﻿using MyFinances.WebApi.Models.Domains;
-using MyFinances.WebApi.Models.Dtos;
+﻿using MyFinances.Core.Dtos;
+using MyFinances.WebApi.Models.Domains;
 
 namespace MyFinances.WebApi.Models.Converters
 {
@@ -36,6 +36,17 @@ namespace MyFinances.WebApi.Models.Converters
                 Id = model.Id,
                 Name = model.Name,
                 Value = model.Value
+            };
+        }
+
+        public static OperationPageDto ToDto(this IDataPage<Operation> model)
+        {
+            return new OperationPageDto
+            {
+                Operations = model.Items != null ? model.Items.Select(x => x.ToDto()) : Enumerable.Empty<OperationDto>(),
+                CurrentPage = model.CurrentPage,
+                LastPage = model.LastPage
+
             };
         }
     }

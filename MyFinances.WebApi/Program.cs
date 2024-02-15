@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MyFinances.WebApi.Models;
 using MyFinances.WebApi.Models.Domains;
+using MyFinances.WebApi.Models.Repositories;
+using MyFinances.WebApi.Models.Services;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,14 +17,16 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
-        $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
+    //c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
+    //    $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
 });
 
 
 builder.Services.AddDbContext<MyFinancesContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("MyFinancesContext")));
-builder.Services.AddScoped<UnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IOperationService, OperationService>();
+builder.Services.AddScoped<IOperationRepository, OperationRepository>();
 
 var app = builder.Build();
 
